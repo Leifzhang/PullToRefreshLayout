@@ -210,25 +210,7 @@ public class PullToRefreshView extends ViewGroup implements NestedScrollingParen
                 }
 
                 final float y = ev.getY(pointerIndex);
-                final float yDiff = y - mInitialMotionY;
-                final float scrollTop = yDiff * DRAG_RATE;
-                mCurrentDragPercent = scrollTop / mTotalDragDistance;
-                if (mCurrentDragPercent < 0) {
-                    return false;
-                }
-                float boundedDragPercent = Math.min(1f, Math.abs(mCurrentDragPercent));
-                float extraOS = Math.abs(scrollTop) - mTotalDragDistance;
-                float slingshotDist = mTotalDragDistance;
-                float tensionSlingshotPercent = Math.max(0,
-                        Math.min(extraOS, slingshotDist * 2) / slingshotDist);
-                float tensionPercent = (float) ((tensionSlingshotPercent / 4) - Math.pow(
-                        (tensionSlingshotPercent / 4), 2)) * 2f;
-                float extraMove = (slingshotDist) * tensionPercent / 2;
-                int targetY = (int) ((slingshotDist * boundedDragPercent) + extraMove);
-
-                mBaseRefreshView.setPercent(mCurrentDragPercent, true);
-                setTargetOffsetTop(targetY - mCurrentOffsetTop);
-                break;
+                return moveSpinner(y);
             }
             case MotionEvent.ACTION_POINTER_DOWN:
                 final int index = ev.getActionIndex();
@@ -257,6 +239,28 @@ public class PullToRefreshView extends ViewGroup implements NestedScrollingParen
             }
         }
 
+        return true;
+    }
+
+    private boolean moveSpinner(float overScrollTop) {
+        final float yDiff = overScrollTop - mInitialMotionY;
+        final float scrollTop = yDiff * DRAG_RATE;
+        mCurrentDragPercent = scrollTop / mTotalDragDistance;
+        if (mCurrentDragPercent < 0) {
+            return false;
+        }
+        float boundedDragPercent = Math.min(1f, Math.abs(mCurrentDragPercent));
+        float extraOS = Math.abs(scrollTop) - mTotalDragDistance;
+        float slingshotDist = mTotalDragDistance;
+        float tensionSlingshotPercent = Math.max(0,
+                Math.min(extraOS, slingshotDist * 2) / slingshotDist);
+        float tensionPercent = (float) ((tensionSlingshotPercent / 4) - Math.pow(
+                (tensionSlingshotPercent / 4), 2)) * 2f;
+        float extraMove = (slingshotDist) * tensionPercent / 2;
+        int targetY = (int) ((slingshotDist * boundedDragPercent) + extraMove);
+
+        mBaseRefreshView.setPercent(mCurrentDragPercent, true);
+        setTargetOffsetTop(targetY - mCurrentOffsetTop);
         return true;
     }
 
@@ -459,8 +463,7 @@ public class PullToRefreshView extends ViewGroup implements NestedScrollingParen
                 mTotalUnconsumed -= dy;
                 consumed[1] = dy;
             }
-
-            //  setTargetOffsetTop((int) mTotalUnconsumed);
+            moveSpinner(mTotalUnconsumed);
         }
         Log.i("NestedPreScroll", String.valueOf(mTotalUnconsumed));
         // If a client layout is using a custom start position for the circle
@@ -514,8 +517,7 @@ public class PullToRefreshView extends ViewGroup implements NestedScrollingParen
         if (dy < 0 && !canChildScrollUp()) {
             mTotalUnconsumed += Math.abs(dy);
             Log.i("NestedPreScroll", String.valueOf(mTotalUnconsumed));
-            //TODO   设置
-            //   setTargetOffsetTop((int) mTotalUnconsumed);
+            moveSpinner(mTotalUnconsumed);
         }
     }
 
