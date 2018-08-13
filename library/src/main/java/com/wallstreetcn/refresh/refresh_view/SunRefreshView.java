@@ -87,12 +87,12 @@ public class SunRefreshView extends BaseRefreshView implements Animatable {
         mScreenWidth = viewWidth;
         mSkyHeight = (int) (SKY_RATIO * mScreenWidth);
         mSkyTopOffset = (mSkyHeight * 0.38f);
-        mSkyMoveOffset = Utils.convertDpToPixel(getContext(), 15);
+        mSkyMoveOffset = Utils.INSTANCE.convertDpToPixel(getContext(), 15);
 
         mTownHeight = (int) (TOWN_RATIO * mScreenWidth);
         mTownInitialTopOffset = (mParent.getTotalDragDistance() - mTownHeight * TOWN_INITIAL_SCALE);
         mTownFinalTopOffset = (mParent.getTotalDragDistance() - mTownHeight * TOWN_FINAL_SCALE);
-        mTownMoveOffset = Utils.convertDpToPixel(getContext(), 10);
+        mTownMoveOffset = Utils.INSTANCE.convertDpToPixel(getContext(), 10);
 
         mSunLeftOffset = 0.3f * (float) mScreenWidth;
         mSunTopOffset = (mParent.getTotalDragDistance() * 0.1f);
